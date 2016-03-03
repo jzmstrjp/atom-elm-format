@@ -4,8 +4,11 @@
   "version": "0.1.0",
   "description": "Run elm-format in Atom",
   "keywords": [
+    "elm",
+    "format",
+    "elm-format"
   ],
-  "repository": "https://github.com/atom/my-package",
+  "repository": "https://github.com/benjick/atom-elm-format",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
