@@ -1,0 +1,15 @@
+{
+  "name": "elm-format",
+  "main": "./lib/elm-format",
+  "version": "0.1.0",
+  "description": "Run elm-format in Atom",
+  "keywords": [
+  ],
+  "repository": "https://github.com/atom/my-package",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}
