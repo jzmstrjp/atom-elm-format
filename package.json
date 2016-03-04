@@ -2,6 +2,15 @@
   "name": "elm-format",
   "main": "./lib/elm-format",
   "version": "0.2.0",
+  "scripts": {
+    "lint": "eslint .",
+    "watch": "ucompiler watch",
+    "compile": "ucompiler go"
+  },
+  "pre-commit": [
+    "lint",
+    "compile"
+  ],
   "description": "Run elm-format in Atom",
   "keywords": [
     "elm",
@@ -13,5 +22,14 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "babel-eslint": "^5.0.0",
+    "babel-preset-steelbrain": "^1.0.1",
+    "eslint": "^2.2.0",
+    "eslint-config-airbnb": "^6.0.2",
+    "pre-commit": "^1.1.2",
+    "ucompiler": "^3.1.8",
+    "ucompiler-plugin-babel": "^3.1.1"
+  }
 }
