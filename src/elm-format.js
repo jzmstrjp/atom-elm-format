@@ -32,7 +32,7 @@ module.exports = {
   },
 
   handleEvents(editor) {
-    return editor.getBuffer().onWillSave(file => {
+    return editor.getBuffer().onDidSave(file => {
       if (atom.config.get('elm-format.formatOnSave')) {
         if (file && path.extname(file.path) === '.elm') {
           this.format(file);
