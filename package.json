@@ -17,7 +17,7 @@
     "format",
     "elm-format"
   ],
-  "repository": "https://github.com/benjick/atom-elm-format",
+  "repository": "https://github.com/triforkse/atom-elm-format",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
