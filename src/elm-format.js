@@ -1,7 +1,6 @@
 'use babel';
 
-import { spawn } from 'child_process';
-import { CompositeDisposable } from 'atom';
+import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
 
 module.exports = {
@@ -67,18 +66,14 @@ module.exports = {
   },
 
   format(file) {
-    const spawned = spawn(atom.config.get('elm-format.binary'), [file.path, '--yes']);
-
-    spawned.stderr.on('data', data => {
-      atom.notifications.addError('elm-format', {
-        detail: data,
-      });
-    });
-
-    spawned.on('close', code => {
-      if (code === 0) {
-        atom.notifications.addSuccess('Formatted file');
-      }
+    new BufferedProcess({
+      command: atom.config.get('elm-format.binary'),
+      args: [file.path, '--yes'],
+      exit: code => {
+        if (code === 0) {
+          atom.notifications.addSuccess('Formatted file');
+        }
+      },
     });
   },
 };
