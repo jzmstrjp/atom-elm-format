@@ -19,6 +19,13 @@ module.exports = {
       default: false,
       order: 2,
     },
+    showNotifications: {
+      title: 'Show notifications on save',
+      description: 'Do you want to see the bar when we save?',
+      type: 'boolean',
+      default: true,
+      order: 3,
+    },
   },
   subscriptions: null,
 
@@ -70,7 +77,7 @@ module.exports = {
       command: atom.config.get('elm-format.binary'),
       args: [file.path, '--yes'],
       exit: code => {
-        if (code === 0) {
+        if (code === 0 && atom.config.get('elm-format.showNotifications')) {
           atom.notifications.addSuccess('Formatted file');
         }
       },
