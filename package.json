@@ -1,7 +1,7 @@
 {
   "name": "elm-format",
   "main": "./lib/elm-format",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "scripts": {
     "lint": "eslint .",
     "watch": "ucompiler watch",
@@ -22,8 +22,7 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-eslint": "^6.0.2",
     "babel-preset-steelbrain": "^2.0.1",
