@@ -2,31 +2,10 @@
 
 import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
+import config from './settings';
 
 module.exports = {
-  config: {
-    binary: {
-      title: 'Binary path',
-      description: 'Path for elm-format',
-      type: 'string',
-      default: '/usr/local/bin/elm-format',
-      order: 1,
-    },
-    formatOnSave: {
-      title: 'Format on save',
-      description: 'Do we format when you save files?',
-      type: 'boolean',
-      default: false,
-      order: 2,
-    },
-    showNotifications: {
-      title: 'Show notifications on save',
-      description: 'Do you want to see the bar when we save?',
-      type: 'boolean',
-      default: true,
-      order: 3,
-    },
-  },
+  config,
   subscriptions: null,
 
   activate() {
