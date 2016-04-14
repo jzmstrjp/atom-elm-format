@@ -3,6 +3,7 @@
 import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
 import config from './settings';
+import { debounce } from 'lodash';
 
 module.exports = {
   config,
@@ -20,7 +21,7 @@ module.exports = {
     return editor.getBuffer().onDidSave(file => {
       if (atom.config.get('elm-format.formatOnSave')) {
         if (file && path.extname(file.path) === '.elm') {
-          this.format(file);
+          debounce(() => this.format(file), 500)();
         }
       }
     });
