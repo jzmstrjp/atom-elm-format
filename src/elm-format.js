@@ -3,11 +3,12 @@
 import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
 import config from './settings';
-import { debounce } from 'lodash';
 
 module.exports = {
   config,
   subscriptions: null,
+  // TODO: Some better debounce/throttle function
+  lastSave: Date.now(),
 
   activate() {
     this.subscriptions = new CompositeDisposable;
@@ -19,9 +20,10 @@ module.exports = {
 
   handleEvents(editor) {
     return editor.getBuffer().onDidSave(file => {
-      if (atom.config.get('elm-format.formatOnSave')) {
-        if (file && path.extname(file.path) === '.elm') {
-          debounce(() => this.format(file), 500)();
+      if (Date.now() - 1000 > this.lastSave) {
+        this.lastSave = Date.now();
+        if (atom.config.get('elm-format.formatOnSave') && this.isElmFile(file)) {
+          this.format(file, editor);
         }
       }
     });
@@ -42,8 +44,8 @@ module.exports = {
 
     const file = editor !== null ? editor.buffer.file : void 0;
 
-    if (file && path.extname(file.path) === '.elm') {
-      this.format(file);
+    if (this.isElmFile(file)) {
+      this.format(file, editor);
     } else {
       atom.notifications.addInfo('Not an Elm file', {
         dismissable: false,
@@ -52,13 +54,23 @@ module.exports = {
     }
   },
 
-  format(file) {
+  isElmFile(file) {
+    return file && path.extname(file.path) === '.elm';
+  },
+
+  format(file, editor) {
+    const cursorPosition = editor.getCursorScreenPosition();
     new BufferedProcess({
       command: atom.config.get('elm-format.binary'),
       args: [file.path, '--yes'],
       exit: code => {
-        if (code === 0 && atom.config.get('elm-format.showNotifications')) {
-          atom.notifications.addSuccess('Formatted file');
+        if (code === 0) {
+          setTimeout(() => {
+            editor.setCursorScreenPosition(cursorPosition);
+          }, 100);
+          if (atom.config.get('elm-format.showNotifications')) {
+            atom.notifications.addSuccess('Formatted file');
+          }
         } else if (atom.config.get('elm-format.showErrorNotifications')) {
           atom.notifications.addError(`elm-format exited with code ${code}`);
         }
