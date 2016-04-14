@@ -24,10 +24,10 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "babel-eslint": "^5.0.0",
-    "babel-preset-steelbrain": "^1.0.1",
+    "babel-eslint": "^6.0.2",
+    "babel-preset-steelbrain": "^2.0.1",
     "eslint": "^2.2.0",
-    "eslint-config-airbnb": "^6.0.2",
+    "eslint-config-airbnb": "^7.0.0",
     "pre-commit": "^1.1.2",
     "ucompiler": "^3.1.8",
     "ucompiler-plugin-babel": "^3.1.1"
