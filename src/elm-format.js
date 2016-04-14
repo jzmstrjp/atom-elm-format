@@ -58,6 +58,8 @@ module.exports = {
       exit: code => {
         if (code === 0 && atom.config.get('elm-format.showNotifications')) {
           atom.notifications.addSuccess('Formatted file');
+        } else if (atom.config.get('elm-format.showErrorNotifications')) {
+          atom.notifications.addError(`elm-format exited with code ${code}`);
         }
       },
     });
