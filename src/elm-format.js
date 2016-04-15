@@ -3,6 +3,7 @@
 import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
 import config from './settings';
+import fs from 'fs';
 
 module.exports = {
   config,
@@ -62,15 +63,18 @@ module.exports = {
     const cursorPosition = editor.getCursorScreenPosition();
     new BufferedProcess({
       command: atom.config.get('elm-format.binary'),
-      args: [file.path, '--yes'],
+      args: [file.path, '--yes', '--output', '/tmp/elm-format.tmp'],
       exit: code => {
         if (code === 0) {
-          setTimeout(() => {
+          fs.readFile('/tmp/elm-format.tmp', 'utf8', (err, data) => {
+            editor.setText(data);
+            editor.save();
             editor.setCursorScreenPosition(cursorPosition);
-          }, 100);
-          if (atom.config.get('elm-format.showNotifications')) {
-            atom.notifications.addSuccess('Formatted file');
-          }
+
+            if (atom.config.get('elm-format.showNotifications')) {
+              atom.notifications.addSuccess('Formatted file');
+            }
+          });
         } else if (atom.config.get('elm-format.showErrorNotifications')) {
           atom.notifications.addError(`elm-format exited with code ${code}`);
         }
