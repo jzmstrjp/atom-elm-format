@@ -17,7 +17,7 @@ export default {
     title: 'Show notifications on save',
     description: 'Do you want to see the bar when we save?',
     type: 'boolean',
-    default: true,
+    default: false,
     order: 3,
   },
   showErrorNotifications: {
