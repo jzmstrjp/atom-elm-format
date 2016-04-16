@@ -20,18 +20,34 @@ module.exports = {
   },
 
   handleEvents(editor) {
-    return editor.getBuffer().onDidSave(file => {
-      if (Date.now() - 1000 > this.lastSave) {
-        this.lastSave = Date.now();
-        if (atom.config.get('elm-format.formatOnSave') && this.isElmFile(file)) {
-          this.format(file, editor);
-        }
+    editor.getBuffer().onDidSave(file => {
+      if (atom.config.get('elm-format.formatOnSave') && this.isElmFile(file)) {
+        this.debounce(() => this.format(file, editor));
       }
     });
   },
 
+  debounce(func) {
+    if (Date.now() - 1000 > this.lastSave) {
+      this.lastSave = Date.now();
+      func();
+    }
+  },
+
   deactivate() {
     this.subscriptions.dispose();
+  },
+
+  error(str) {
+    if (atom.config.get('elm-format.showErrorNotifications')) {
+      atom.notifications.addError(str);
+    }
+  },
+
+  success(str) {
+    if (atom.config.get('elm-format.showNotifications')) {
+      atom.notifications.addSuccess(str);
+    }
   },
 
   formatCurrentFile() {
@@ -71,12 +87,10 @@ module.exports = {
             editor.save();
             editor.setCursorScreenPosition(cursorPosition);
 
-            if (atom.config.get('elm-format.showNotifications')) {
-              atom.notifications.addSuccess('Formatted file');
-            }
+            this.success('Formatted file');
           });
-        } else if (atom.config.get('elm-format.showErrorNotifications')) {
-          atom.notifications.addError(`elm-format exited with code ${code}`);
+        } else {
+          this.error(`elm-format exited with code ${code}`);
         }
       },
     });
