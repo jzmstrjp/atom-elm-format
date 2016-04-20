@@ -78,7 +78,7 @@ module.exports = {
 
   format(file, editor) {
     const cursorPosition = editor.getCursorScreenPosition();
-    const tmpFile = path.join(os.tmpdir(), '/tmp/elm-format.tmp');
+    const tmpFile = path.join(os.tmpdir(), 'elm-format.tmp');
     new BufferedProcess({
       command: atom.config.get('elm-format.binary'),
       args: [file.path, '--yes', '--output', tmpFile],
