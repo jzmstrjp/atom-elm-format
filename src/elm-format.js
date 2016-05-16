@@ -4,6 +4,7 @@ import { CompositeDisposable, BufferedProcess } from 'atom';
 import path from 'path';
 import config from './settings';
 import fs from 'fs';
+import os from 'os';
 
 module.exports = {
   config,
@@ -77,12 +78,13 @@ module.exports = {
 
   format(file, editor) {
     const cursorPosition = editor.getCursorScreenPosition();
+    const tmpFile = path.join(os.tmpdir(), 'elm-format.tmp');
     new BufferedProcess({
       command: atom.config.get('elm-format.binary'),
-      args: [file.path, '--yes', '--output', '/tmp/elm-format.tmp'],
+      args: [file.path, '--yes', '--output', tmpFile],
       exit: code => {
         if (code === 0) {
-          fs.readFile('/tmp/elm-format.tmp', 'utf8', (err, data) => {
+          fs.readFile(tmpFile, 'utf8', (err, data) => {
             editor.setText(data);
             editor.save();
             editor.setCursorScreenPosition(cursorPosition);
