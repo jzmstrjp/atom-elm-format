@@ -10,7 +10,7 @@ export default {
     title: 'Format on save',
     description: 'Do we format when you save files?',
     type: 'boolean',
-    default: false,
+    default: true,
     order: 2,
   },
   showNotifications: {
