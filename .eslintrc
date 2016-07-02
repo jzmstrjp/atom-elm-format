@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb/base",
+  "extends": "airbnb-base",
   "parser": "babel-eslint",
   "globals": {
     "atom": "true"
@@ -9,6 +9,7 @@
     "node": true
   },
   "rules": {
-    "no-new": 0
+    "no-new": 0,
+    "import/no-unresolved": [2, { ignore: ['atom'] }]
   }
 }
