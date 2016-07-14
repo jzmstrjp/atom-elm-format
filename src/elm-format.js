@@ -83,16 +83,18 @@ module.exports = {
       command: atom.config.get('elm-format.binary'),
       args: [file.path, '--yes', '--output', tmpFile],
       exit: code => {
-        if (code === 0) {
-          fs.readFile(tmpFile, 'utf8', (err, data) => {
-            editor.setText(data);
-            editor.save();
-            editor.setCursorScreenPosition(cursorPosition);
+        if (editor.isAlive()) {
+          if (code === 0) {
+            fs.readFile(tmpFile, 'utf8', (err, data) => {
+              editor.setText(data);
+              editor.save();
+              editor.setCursorScreenPosition(cursorPosition);
 
-            this.success('Formatted file');
-          });
-        } else {
-          this.error(`elm-format exited with code ${code}`);
+              this.success('Formatted file');
+            });
+          } else {
+            this.error(`elm-format exited with code ${code}`);
+          }
         }
       },
     });
