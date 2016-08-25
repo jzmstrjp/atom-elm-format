@@ -1,38 +1,28 @@
 'use babel';
 
-import { CompositeDisposable, BufferedProcess } from 'atom';
+import { CompositeDisposable } from 'atom';
 import path from 'path';
 import config from './settings';
-import fs from 'fs';
-import os from 'os';
+import childProcess from 'child_process';
 
 module.exports = {
   config,
   subscriptions: null,
-  // TODO: Some better debounce/throttle function
-  lastSave: Date.now(),
 
   activate() {
     this.subscriptions = new CompositeDisposable;
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'elm-format:file': () => this.formatCurrentFile(),
     }));
-    this.editorObserver = atom.workspace.observeTextEditors(e => this.handleEvents(e));
+    this.subscriptions.add(atom.workspace.observeTextEditors(e => this.handleEvents(e)));
   },
 
   handleEvents(editor) {
-    editor.getBuffer().onDidSave(file => {
-      if (atom.config.get('elm-format.formatOnSave') && this.isElmFile(file)) {
-        this.debounce(() => this.format(file, editor));
+    editor.getBuffer().onWillSave(() => {
+      if (atom.config.get('elm-format.formatOnSave') && this.isElmEditor(editor)) {
+        this.format(editor);
       }
     });
-  },
-
-  debounce(func) {
-    if (Date.now() - 1000 > this.lastSave) {
-      this.lastSave = Date.now();
-      func();
-    }
   },
 
   deactivate() {
@@ -52,18 +42,12 @@ module.exports = {
   },
 
   formatCurrentFile() {
-    const editor = atom.workspace.getActivePaneItem();
-
-    if (!editor || editor.isModified()) {
-      // Abort for invalid or unsaved text editors
-      atom.notifications.addError('Please save before formatting');
+    const editor = atom.workspace.getActiveTextEditor();
+    if (!editor) {
       return;
     }
-
-    const file = editor !== null ? editor.buffer.file : void 0;
-
-    if (this.isElmFile(file)) {
-      this.format(file, editor);
+    if (this.isElmEditor(editor)) {
+      this.format(editor);
     } else {
       atom.notifications.addInfo('Not an Elm file', {
         dismissable: false,
@@ -72,31 +56,32 @@ module.exports = {
     }
   },
 
-  isElmFile(file) {
-    return file && path.extname(file.path) === '.elm';
+  isElmEditor(editor) {
+    return editor && editor.getPath && editor.getPath() &&
+      path.extname(editor.getPath()) === '.elm';
   },
 
-  format(file, editor) {
-    const cursorPosition = editor.getCursorScreenPosition();
-    const tmpFile = path.join(os.tmpdir(), 'elm-format.tmp');
-    new BufferedProcess({
-      command: atom.config.get('elm-format.binary'),
-      args: [file.path, '--yes', '--output', tmpFile],
-      exit: code => {
-        if (editor.isAlive()) {
-          if (code === 0) {
-            fs.readFile(tmpFile, 'utf8', (err, data) => {
-              editor.setText(data);
-              editor.save();
-              editor.setCursorScreenPosition(cursorPosition);
+  format(editor) {
+    try {
+      const { status, stdout } = childProcess.spawnSync(
+        atom.config.get('elm-format.binary'),
+        ['--stdin'], { input: editor.getText() });
+      if (status === 0) {
+        const cursorPosition = editor.getCursorScreenPosition();
+        // const marker = editor.markScreenRange([cursorPosition, cursorPosition], {
+        //   invalidate: 'never', persistent: false
+        // });
+        editor.buffer.setTextViaDiff(stdout.toString());
+        // editor.setCursorScreenPosition(marker.getStartScreenPosition());
+        // marker.destroy();
+        editor.setCursorScreenPosition(cursorPosition);
 
-              this.success('Formatted file');
-            });
-          } else {
-            this.error(`elm-format exited with code ${code}`);
-          }
-        }
-      },
-    });
+        this.success('Formatted file');
+      } else {
+        this.error(`elm-format exited with code ${status}`);
+      }
+    } catch (exception) {
+      this.error(`elm-format exception: ${exception}`);
+    }
   },
 };
