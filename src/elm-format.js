@@ -68,12 +68,7 @@ module.exports = {
         ['--stdin'], { input: editor.getText() });
       if (status === 0) {
         const cursorPosition = editor.getCursorScreenPosition();
-        // const marker = editor.markScreenRange([cursorPosition, cursorPosition], {
-        //   invalidate: 'never', persistent: false
-        // });
         editor.buffer.setTextViaDiff(stdout.toString());
-        // editor.setCursorScreenPosition(marker.getStartScreenPosition());
-        // marker.destroy();
         editor.setCursorScreenPosition(cursorPosition);
 
         this.success('Formatted file');
