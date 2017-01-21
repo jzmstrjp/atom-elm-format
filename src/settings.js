@@ -1,4 +1,6 @@
-module.exports = {
+'use babel';
+
+export default {
   binary: {
     title: 'Binary path',
     description: 'Path for elm-format',
