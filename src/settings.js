@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   binary: {
     title: 'Binary path',
     description: 'Path for elm-format',
