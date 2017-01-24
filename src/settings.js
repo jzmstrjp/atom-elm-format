@@ -1,3 +1,5 @@
+'use babel';
+
 export default {
   binary: {
     title: 'Binary path',

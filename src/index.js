@@ -1,16 +1,16 @@
 'use babel';
 
-import { CompositeDisposable } from 'atom';
+import { CompositeDisposable } from 'atom'; // eslint-disable-line
 import path from 'path';
-import config from './settings';
 import childProcess from 'child_process';
+import config from './settings';
 
-module.exports = {
+export default {
   config,
   subscriptions: null,
 
   activate() {
-    this.subscriptions = new CompositeDisposable;
+    this.subscriptions = new CompositeDisposable();
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'elm-format:file': () => this.formatCurrentFile(),
     }));
@@ -66,14 +66,23 @@ module.exports = {
       const { status, stdout } = childProcess.spawnSync(
         atom.config.get('elm-format.binary'),
         ['--stdin'], { input: editor.getText() });
-      if (status === 0) {
-        const cursorPosition = editor.getCursorScreenPosition();
-        editor.buffer.setTextViaDiff(stdout.toString());
-        editor.setCursorScreenPosition(cursorPosition);
+      switch (status) {
+        case 0: {
+          const cursorPosition = editor.getCursorScreenPosition();
+          editor.buffer.setTextViaDiff(stdout.toString());
+          editor.setCursorScreenPosition(cursorPosition);
 
-        this.success('Formatted file');
-      } else {
-        this.error(`elm-format exited with code ${status}`);
+          this.success('Formatted file');
+          break;
+        }
+        case 1:
+          this.error('Can\'t format, syntax error maybe?');
+          break;
+        case null:
+          this.error('Can\'t find elm-format binary, check your settings');
+          break;
+        default:
+          this.error(`elm-format exited with code ${status}.`);
       }
     } catch (exception) {
       this.error(`elm-format exception: ${exception}`);
