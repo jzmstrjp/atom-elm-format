@@ -5,6 +5,7 @@ import path from 'path';
 import childProcess from 'child_process';
 import fs from 'fs';
 import config from './settings';
+import { installInstructions } from './helpers';
 
 export default {
   config,
@@ -30,9 +31,9 @@ export default {
     this.subscriptions.dispose();
   },
 
-  error(str) {
+  error(str, options = {}) {
     if (atom.config.get('elm-format.showErrorNotifications')) {
-      atom.notifications.addError(str);
+      atom.notifications.addError(str, options);
     }
   },
 
@@ -82,9 +83,9 @@ export default {
           break;
         case null:
           if (fs.existsSync(binary)) {
-            this.error('Can\'t execute the elm-format binary, is it executable?');
+            this.error('Can\'t execute the elm-format binary, is it executable?', installInstructions);
           } else {
-            this.error('Can\'t find the elm-format binary, check the "elm-format" package settings page');
+            this.error('Can\'t find the elm-format binary, check the "elm-format" package settings page', installInstructions);
           }
           break;
         default:
