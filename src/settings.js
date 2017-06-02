@@ -5,7 +5,7 @@ export default {
     title: 'Binary path',
     description: 'Path for elm-format',
     type: 'string',
-    default: '/usr/local/bin/elm-format',
+    default: 'elm-format',
     order: 1,
   },
   formatOnSave: {
