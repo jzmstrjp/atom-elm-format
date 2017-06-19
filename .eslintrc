@@ -1,7 +1,11 @@
 {
   "extends": "airbnb-base",
+  "rules": {
+    "import/prefer-default-export": 0
+  },
   "globals": {
-    "atom": "true"
+    "atom": "true",
+    "fetch": true
   },
   "env": {
     "es6": true,

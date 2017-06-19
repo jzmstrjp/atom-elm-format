@@ -4,6 +4,7 @@ import { CompositeDisposable } from 'atom'; // eslint-disable-line
 import path from 'path';
 import childProcess from 'child_process';
 import config from './settings';
+import { fetchAssets } from './helpers';
 
 export default {
   config,
@@ -13,6 +14,7 @@ export default {
     this.subscriptions = new CompositeDisposable();
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'elm-format:file': () => this.formatCurrentFile(),
+      'elm-format:fetch-binary': () => this.fetchBinary(),
     }));
     this.subscriptions.add(atom.workspace.observeTextEditors(e => this.handleEvents(e)));
   },
@@ -87,5 +89,19 @@ export default {
     } catch (exception) {
       this.error(`elm-format exception: ${exception}`);
     }
+  },
+
+  async fetchBinary() {
+    const assets = await fetchAssets();
+    atom.notifications.addInfo('Pick a release to download', {
+      buttons: assets.map(asset => ({
+        className: asset.prefered ? 'btn btn-primary' : 'btn',
+        onDidClick: () => {
+          console.log(asset); // eslint-disable-line no-console
+        },
+        text: asset.name,
+      })),
+    });
+    console.log('assets', assets); // eslint-disable-line no-console
   },
 };
