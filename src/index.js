@@ -10,21 +10,31 @@ import { installInstructions } from './helpers';
 export default {
   config,
   subscriptions: null,
+  errorLineNum: null,
 
   activate() {
     this.subscriptions = new CompositeDisposable();
     this.subscriptions.add(atom.commands.add('atom-workspace', {
       'elm-format:file': () => this.formatCurrentFile(),
+      'elm-format:jump-to-syntax-error': () => this.jumpToSyntaxError(),
     }));
     this.subscriptions.add(atom.workspace.observeTextEditors(e => this.handleEvents(e)));
   },
 
   handleEvents(editor) {
     editor.getBuffer().onWillSave(() => {
-      if (atom.config.get('elm-format.formatOnSave') && this.isElmEditor(editor)) {
+      const formatOnSave = atom.config.get('elm-format.formatOnSave');
+      if (formatOnSave && this.isElmEditor(editor)) {
         this.format(editor);
       }
     });
+  },
+
+  jumpToSyntaxError() {
+    if (errorLineNum !== null) {
+      const editor = atom.workspace.getActiveTextEditor();
+      this.gotoLine(editor, errorLineNum );
+    }
   },
 
   deactivate() {
@@ -63,23 +73,57 @@ export default {
       path.extname(editor.getPath()) === '.elm';
   },
 
+  gotoLine(editor, lineNum) {
+    editor.getSelections()[0].cursor.setScreenPosition({row: lineNum - 1, column: 0});
+    editor.scrollToCursorPosition();
+  },
+
   format(editor) {
     try {
+      // Reset the error tracker.
+      errorLineNum = null;
       const binary = atom.config.get('elm-format.binary');
-      const { status, stdout } = childProcess.spawnSync(
+
+      const { status, stdout, stderr } = childProcess.spawnSync(
         binary,
         ['--stdin'], { input: editor.getText() });
+
       switch (status) {
         case 0: {
           const cursorPosition = editor.getCursorScreenPosition();
           editor.buffer.setTextViaDiff(stdout.toString());
           editor.setCursorScreenPosition(cursorPosition);
-
-          this.success('Formatted file');
+          this.success('File Formatted');
           break;
         }
         case 1:
-          this.error('Can\'t format, syntax error maybe?');
+          // Remove term colors
+          const errorText = stderr.toString()
+            .replace(/\[\d{1,2}m/g, "")
+            .replace(/[\s\S]*I ran into something unexpected when parsing your code!/i, "");
+
+          const matches = errorText.match(/(\d+)│\s/)
+          let options = {};
+
+          if (matches && matches.length > 1) {
+            errorLineNum = parseInt(matches[1], 10);
+            const shouldAutoJump = atom.config.get('elm-format.autoJumpToSyntaxError');
+
+            if (shouldAutoJump) {
+              this.gotoLine(editor, errorLineNum );
+            }
+            else {
+              options.buttons = [{
+                className: 'btn btn-error',
+                onDidClick: () => {
+                  this.gotoLine(editor, errorLineNum)
+                },
+                text: 'Jump to Syntax Error',
+              }];
+            }
+          }
+
+          this.error('Elm Format Failed\n\n' + errorText, options);
           break;
         case null:
           if (fs.existsSync(binary)) {

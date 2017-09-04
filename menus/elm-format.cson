@@ -2,7 +2,7 @@
 'context-menu':
   'atom-text-editor': [
     {
-      'label': 'Format this file'
+      'label': 'Format File'
       'command': 'elm-format:file'
     }
   ]
@@ -13,8 +13,12 @@
       'label': 'elm-format'
       'submenu': [
         {
-          'label': 'Format this file'
+          'label': 'Format File'
           'command': 'elm-format:file'
+        },
+        {
+          'label': "Jump to syntax error"
+          'command': 'elm-format:jump-to-syntax-error'
         }
       ]
     ]
