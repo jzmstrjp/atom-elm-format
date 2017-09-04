@@ -3,7 +3,9 @@
 import { CompositeDisposable } from 'atom'; // eslint-disable-line
 import path from 'path';
 import childProcess from 'child_process';
+import fs from 'fs';
 import config from './settings';
+import { installInstructions } from './helpers';
 
 export default {
   config,
@@ -29,9 +31,9 @@ export default {
     this.subscriptions.dispose();
   },
 
-  error(str) {
+  error(str, options = {}) {
     if (atom.config.get('elm-format.showErrorNotifications')) {
-      atom.notifications.addError(str);
+      atom.notifications.addError(str, options);
     }
   },
 
@@ -63,8 +65,9 @@ export default {
 
   format(editor) {
     try {
+      const binary = atom.config.get('elm-format.binary');
       const { status, stdout } = childProcess.spawnSync(
-        atom.config.get('elm-format.binary'),
+        binary,
         ['--stdin'], { input: editor.getText() });
       switch (status) {
         case 0: {
@@ -79,7 +82,11 @@ export default {
           this.error('Can\'t format, syntax error maybe?');
           break;
         case null:
-          this.error('Can\'t find elm-format binary, check your settings');
+          if (fs.existsSync(binary)) {
+            this.error('Can\'t execute the elm-format binary, is it executable?', installInstructions);
+          } else {
+            this.error('Can\'t find the elm-format binary, check the "elm-format" package settings page', installInstructions);
+          }
           break;
         default:
           this.error(`elm-format exited with code ${status}.`);
