@@ -8,6 +8,13 @@ export default {
     default: 'elm-format',
     order: 6,
   },
+  elmVersion: {
+    title: 'Elm Version',
+    description: 'The version of Elm to use when formatting.',
+    type: 'string',
+    default: '0.19',
+    enum: ['0.18', '0.19']
+  },
   formatOnSave: {
     title: 'Format on save',
     description: 'Do we format when you save files?',

@@ -83,10 +83,11 @@ export default {
       // Reset the error tracker.
       errorLineNum = null;
       const binary = atom.config.get('elm-format.binary');
+      const elmVersion = atom.config.get('elm-format.elmVersion') || "0.19";
 
       const { status, stdout, stderr } = childProcess.spawnSync(
         binary,
-        ['--stdin'], { input: editor.getText() });
+        ['--elm-version', elmVersion, '--stdin'], { input: editor.getText() });
 
       switch (status) {
         case 0: {

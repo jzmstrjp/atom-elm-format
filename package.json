@@ -5,16 +5,13 @@
   "scripts": {
     "lint": "eslint ."
   },
-  "pre-commit": [
-    "lint"
-  ],
   "description": "Run elm-format in Atom",
   "keywords": [
     "elm",
     "format",
     "elm-format"
   ],
-  "repository": "https://github.com/triforkse/atom-elm-format",
+  "repository": "https://github.com/humio/atom-elm-format",
   "license": "MIT",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
