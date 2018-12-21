@@ -79,9 +79,11 @@ export default {
   },
 
   preFormat(editor){
+    const limit = 80;
     const cursorPosition = editor.getCursorScreenPosition();
     const old_text = editor.getText();
-    const new_text = old_text.replace(/[^\n]{80,}/g, a => a.replace(/(,|\+)/, "\n$1"));
+    const regExp = new RegExp(`[^\n]{${limit},}`, "g");
+    const new_text = old_text.replace(regExp, a => a.replace(/(,|\+)/, "\n$1"));
     editor.buffer.setTextViaDiff(new_text);
     editor.setCursorScreenPosition(cursorPosition);
   },
