@@ -78,7 +78,16 @@ export default {
     editor.scrollToCursorPosition();
   },
 
+  preFormat(editor){
+    const cursorPosition = editor.getCursorScreenPosition();
+    const old_text = editor.getText();
+    const new_text = old_text.replace(/[^\n]{80,}/g, a => a.replace(/(,|\+)/, "\n$1"));
+    editor.buffer.setTextViaDiff(new_text);
+    editor.setCursorScreenPosition(cursorPosition);
+  },
+
   format(editor) {
+    this.preFormat(editor);
     try {
       // Reset the error tracker.
       errorLineNum = null;
