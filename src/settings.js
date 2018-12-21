@@ -42,5 +42,12 @@ export default {
     type: 'boolean',
     default: true,
     order: 2
+  },
+  characterLimitInALine: {
+    title: 'Character limit in a line',
+    type: 'string',
+    default: 'No limit',
+    enum: [ 'No limit', '80', '100', '120', '140', '160'],
+    order: 7,
   }
 };

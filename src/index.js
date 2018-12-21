@@ -79,11 +79,13 @@ export default {
   },
 
   preFormat(editor){
-    const limit = 80;
+    const limitStr = atom.config.get('elm-format.characterLimitInALine');
+    if(limitStr === 'No limit') return;
+    const limitNum = parseInt(limitStr);
     const cursorPosition = editor.getCursorScreenPosition();
     const old_text = editor.getText();
-    const regExp = new RegExp(`[^\n]{${limit},}`, "g");
-    const new_text = old_text.replace(regExp, a => a.replace(/(,|\+)/, "\n$1"));
+    const regExp = new RegExp(`[^\n]{${limitNum},}`, "g");
+    const new_text = old_text.replace(regExp, a => a.replace(/([^ ])(,|( |)\+)/, "$1\n$2"));
     editor.buffer.setTextViaDiff(new_text);
     editor.setCursorScreenPosition(cursorPosition);
   },
